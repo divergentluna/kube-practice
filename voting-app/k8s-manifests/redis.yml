@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+  labels:
+    app: redis
+    tier: back-tier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      tier: back-tier
+  template:
+    metadata:
+      labels:
+        app: redis
+        tier: back-tier
+    spec:
+      containers:
+        - name: redis
+          image: redis:alpine
+...
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  labels:
+    app: redis
+    tier: backend
+spec:
+  ports:
+  - port: 6379
+  selector:
+    app: redis
+    tier: backend
+...
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-healthcheck-configmap
+  labels:
+    app: redis
+    tier: backend
+data:
+  redis.sh: "#!/bin/sh\nset -eo pipefail\n\nhost=\"$(hostname -i || echo '127.0.0.1')\"\n\nif
+    ping=\"$(redis-cli -h \"$host\" ping)\" && [ \"$ping\" = 'PONG' ]; then\n\texit
+    0\nfi\n\nexit 1\n"
+
