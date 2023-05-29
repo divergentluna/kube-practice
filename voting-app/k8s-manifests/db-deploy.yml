@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: postgres
+    tier: back-tier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+      tier: back-tier
+  template:
+    metadata:
+      labels:
+        app: postgres
+        tier: back-tier
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          envFrom:
+            - configMapRef:
+                name: postgres-credentials-configmap
+          volumeMounts:
+            - name: healthcheck
+              mountPath: /healthchecks
+      volumes:
+        - name: healthcheck
+          configMap:
+            name: postgres-healthcheck-configmap

@@ -1,0 +1,36 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+  labels:
+    app: redis
+    tier: back-tier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      tier: back-tier
+  template:
+    metadata:
+      labels:
+        app: redis
+        tier: back-tier
+    spec:
+      containers:
+        - name: redis
+          image: redis:alpine
+          volumeMounts:
+            - name: credentials
+              mountPath: /usr/local/etc/redis/
+            - name: healthcheck
+              mountPath: /healthchecks
+      volumes:
+        - name: healthcheck
+          configMap:
+            name: redis-healthcheck-configmap
+        - name: credentials
+          configMap:
+            name: redis-credentials-configmap
+  
