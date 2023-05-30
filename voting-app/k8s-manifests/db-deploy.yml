@@ -21,12 +21,21 @@ spec:
       containers:
         - name: postgres
           image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
           envFrom:
             - configMapRef:
                 name: postgres-credentials-configmap
           volumeMounts:
             - name: healthcheck
               mountPath: /healthchecks
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - /healthchecks/postgres.sh
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
         - name: healthcheck
           configMap:

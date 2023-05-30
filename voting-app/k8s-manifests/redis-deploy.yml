@@ -21,11 +21,20 @@ spec:
       containers:
         - name: redis
           image: redis:alpine
+          ports:
+            - containerPort: 6379
           volumeMounts:
             - name: credentials
               mountPath: /usr/local/etc/redis/
             - name: healthcheck
               mountPath: /healthchecks
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - /healthchecks/redis.sh
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
         - name: healthcheck
           configMap:
