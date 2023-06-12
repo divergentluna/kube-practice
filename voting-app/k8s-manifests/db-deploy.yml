@@ -34,7 +34,8 @@ spec:
           readinessProbe:
             exec:
               command:
-                - sh
+                - bash
+                - -c
                 - /healthchecks/postgres.sh
             initialDelaySeconds: 5
             periodSeconds: 5
@@ -44,3 +45,4 @@ spec:
         - name: healthcheck
           configMap:
             name: postgres-healthcheck-configmap
+            defaultMode: 0777
